@@ -33,7 +33,7 @@ sns.heatmap(data.corr(), annot=True, cmap='coolwarm')
 plt.title('Correlation Matrix')
 # Saving the heatmap image
 plt.savefig('correlation_heatmap.png') 
-plt.show()
+plt.close()
 
 sns.set(style="whitegrid") 
 sns.scatterplot(x='rm', y='medv', data=data)
@@ -46,7 +46,7 @@ plt.ylabel("Median Value of Homes (MEDV)")
 # Save the plot as a PNG file
 plt.savefig("rm_vs_medv_plot.png")
 
-plt.show()
+plt.close()
 
 X = data.drop(columns=['medv']) # Features
 y = data['medv'] # Target
@@ -88,7 +88,7 @@ plt.legend()
 
 # Saving the actual vs predicted price plot as an image
 plt.savefig('actual_vs_predicted_prices.png') 
-plt.show()
+plt.close()
 
 
 
