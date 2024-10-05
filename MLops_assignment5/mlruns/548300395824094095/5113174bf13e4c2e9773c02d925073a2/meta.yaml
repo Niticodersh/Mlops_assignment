@@ -1,0 +1,15 @@
+artifact_uri: file:///home/nitish_linux/Mlops_assignment/MLops_assignment5/mlruns/548300395824094095/5113174bf13e4c2e9773c02d925073a2/artifacts
+end_time: 1728165340006
+entry_point_name: ''
+experiment_id: '548300395824094095'
+lifecycle_stage: active
+run_id: 5113174bf13e4c2e9773c02d925073a2
+run_name: marvelous-shad-161
+run_uuid: 5113174bf13e4c2e9773c02d925073a2
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728165337692
+status: 3
+tags: []
+user_id: nitish_linux

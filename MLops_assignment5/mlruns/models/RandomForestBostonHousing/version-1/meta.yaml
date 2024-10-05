@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1728165207917
+current_stage: None
+description: null
+last_updated_timestamp: 1728165207917
+name: RandomForestBostonHousing
+run_id: bff55fb25c3f4a64aec3e6ad04aa665f
+run_link: null
+source: file:///home/nitish_linux/Mlops_assignment/MLops_assignment5/mlruns/0/bff55fb25c3f4a64aec3e6ad04aa665f/artifacts/model
+status: READY
+status_message: null
+storage_location: file:///home/nitish_linux/Mlops_assignment/MLops_assignment5/mlruns/0/bff55fb25c3f4a64aec3e6ad04aa665f/artifacts/model
+user_id: null
+version: 1

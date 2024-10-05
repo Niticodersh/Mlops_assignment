@@ -10,10 +10,14 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 import requests
 import os
+import dagshub 
 
+dagshub.init(repo_owner='Niticodersh', repo_name='Mlops_assignment', mlflow=True)
 # Set the tracking URI (replace 'your_tracking_uri' with your actual tracking URI)
-mlflow.set_tracking_uri("https://dagshub.com/Niticodersh/Mlops_assignment.mlflow")  # Example for a local MLflow server
+mlflow.set_experiment("BostnHousingExperiment")
 
+remote_server_uri = 'https://dagshub.com/Niticodersh/Mlops_assignment.mlflow'
+mlflow.set_registry_uri(remote_server_uri)
 # Create a directory for saving plots if it doesn't exist
 if not os.path.exists('plots'):
     os.makedirs('plots')
@@ -79,6 +83,7 @@ signature = mlflow.models.signature.infer_signature(X_train, y_train)
 # Get the tracking URI type
 tracking_url_type_store = mlflow.get_tracking_uri()
 
+print("------------------Linear Regression Tracking------------------------")
 # Log the Linear Regression model conditionally based on tracking URL type
 if tracking_url_type_store != "file":
     mlflow.sklearn.log_model(
@@ -125,6 +130,7 @@ if not os.path.exists('artifacts/random_forest'):
 mlflow.log_param("model_type", "Random Forest")
 mlflow.log_metric("mse", mse_rf)
 
+print("------------------Random Forest Tracking------------------------")
 # Log the Random Forest model conditionally based on tracking URL type
 if tracking_url_type_store != "file":
     mlflow.sklearn.log_model(
@@ -165,6 +171,8 @@ else:
     best_model = rf_model
     best_model_name = "random_forest_model"
     print("\nBest model: Random Forest")
+
+print("------------------Registring Best Model------------------------")
 
 # Step 11: Save the best model
 mlflow.start_run()  # Start a new run for saving the best model
