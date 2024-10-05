@@ -169,8 +169,15 @@ print("------------------Registring Best Model------------------------")
 mlflow.start_run()  # Start a new run for saving the best model
 mlflow.sklearn.log_model(best_model, "best_model")
 
-model_uri = f"runs:/{mlflow.active_run().info.run_id}/best_model"
-mlflow.register_model(model_uri, best_model_name)
+# model_uri = f"runs:/{mlflow.active_run().info.run_id}/best_model"
+# mlflow.register_model(model_uri, best_model_name)
+
+if tracking_url_type_store != "file":
+    mlflow.sklearn.log_model(
+        best_model, f"best_model={best_model_name}", registered_model_name="BestModelBostonHousing", signature=signature
+    )
+else:
+    mlflow.sklearn.log_model(best_model,  f"best_model={best_model_name}", signature=signature)
 
 mlflow.end_run()
 
