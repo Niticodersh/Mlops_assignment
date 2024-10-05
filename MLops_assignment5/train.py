@@ -22,7 +22,6 @@ mlflow.set_registry_uri(remote_server_uri)
 if not os.path.exists('plots'):
     os.makedirs('plots')
 
-# Step 1: Download the dataset
 url = "https://raw.githubusercontent.com/selva86/datasets/master/BostonHousing.csv"
 response = requests.get(url)
 
@@ -31,10 +30,8 @@ with open("BostonHousing.csv", "wb") as file:
 
 print("Dataset downloaded successfully!")
 
-# Step 2: Load the dataset
 data = pd.read_csv("BostonHousing.csv")
 
-# Step 3: Display first few rows and summary statistics
 print("First 5 rows of dataset:")
 print(data.head())
 
@@ -44,7 +41,6 @@ print(data.describe())
 print("Missing values check:")
 print(data.isnull().sum())
 
-# Step 4: Plot correlation heatmap
 plt.figure(figsize=(10, 8))
 sns.heatmap(data.corr(), annot=True, cmap='coolwarm')
 plt.title('Correlation Matrix')
@@ -52,7 +48,6 @@ correlation_heatmap_path = 'plots/correlation_heatmap.png'
 plt.savefig(correlation_heatmap_path)  # Save the heatmap image
 plt.close()
 
-# Step 5: Prepare data for training
 X = data.drop(columns=['medv'])  # Features
 y = data['medv']  # Target
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -60,7 +55,6 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 # Initialize MLflow
 mlflow.start_run()
 
-# Step 6: Train Linear Regression model
 lr_model = LinearRegression()
 lr_model.fit(X_train, y_train)  # Train the model
 y_pred_lr = lr_model.predict(X_test)  # Make predictions
@@ -113,7 +107,6 @@ mlflow.end_run()
 # Start a new run for Random Forest
 mlflow.start_run()
 
-# Step 7: Train Random Forest model
 rf_model = RandomForestRegressor(random_state=42)
 rf_model.fit(X_train, y_train)  # Train the model
 y_pred_rf = rf_model.predict(X_test)  # Make predictions
@@ -160,7 +153,6 @@ mlflow.log_artifact(correlation_heatmap_path)
 # End the second MLflow run
 mlflow.end_run()
 
-# Step 10: Compare models and save the best one
 best_model = None
 best_model_name = ""
 if mse_lr < mse_rf:
@@ -174,18 +166,14 @@ else:
 
 print("------------------Registring Best Model------------------------")
 
-# Step 11: Save the best model
 mlflow.start_run()  # Start a new run for saving the best model
 mlflow.sklearn.log_model(best_model, "best_model")
 
-# Step 12: Register the best model in the MLflow Model Registry
 model_uri = f"runs:/{mlflow.active_run().info.run_id}/best_model"
 mlflow.register_model(model_uri, best_model_name)
 
-# Step 13: End the run
 mlflow.end_run()
 
-# Step 14: Print comparison results
 print("\nComparison of Models:")
 print(f"Linear Regression MSE: {mse_lr}")
 print(f"Random Forest MSE: {mse_rf}")
