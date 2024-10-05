@@ -1,0 +1,15 @@
+artifact_uri: file:///workspace/Mlops_assignment/ML_flow/mlruns/899906852140557872/3f14450bff1f49f8917d15c4179bb33e/artifacts
+end_time: 1727763046637
+entry_point_name: ''
+experiment_id: '899906852140557872'
+lifecycle_stage: active
+run_id: 3f14450bff1f49f8917d15c4179bb33e
+run_name: Random_Forest
+run_uuid: 3f14450bff1f49f8917d15c4179bb33e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727763045029
+status: 3
+tags: []
+user_id: root

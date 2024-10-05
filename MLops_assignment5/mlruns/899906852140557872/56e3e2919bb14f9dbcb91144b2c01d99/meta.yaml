@@ -1,0 +1,15 @@
+artifact_uri: file:///workspace/Mlops_assignment/ML_flow/mlruns/899906852140557872/56e3e2919bb14f9dbcb91144b2c01d99/artifacts
+end_time: 1728111523678
+entry_point_name: ''
+experiment_id: '899906852140557872'
+lifecycle_stage: active
+run_id: 56e3e2919bb14f9dbcb91144b2c01d99
+run_name: gifted-fawn-202
+run_uuid: 56e3e2919bb14f9dbcb91144b2c01d99
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728111522301
+status: 3
+tags: []
+user_id: root
