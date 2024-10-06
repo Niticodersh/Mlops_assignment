@@ -8,29 +8,18 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
-import requests
-import os
-import dagshub 
+import os 
 
-dagshub.init(repo_owner='Niticodersh', repo_name='Mlops_assignment', mlflow=True)
-# Set the tracking URI (replace 'your_tracking_uri' with your actual tracking URI)
-mlflow.set_experiment("BostnHousingExperiment")
+# Set the experiment name for MLflow
+mlflow.set_experiment("BostonHousingExperiment")
 
-remote_server_uri = 'https://dagshub.com/Niticodersh/Mlops_assignment.mlflow'
-mlflow.set_registry_uri(remote_server_uri)
 # Create a directory for saving plots if it doesn't exist
 if not os.path.exists('plots'):
     os.makedirs('plots')
 
+# Load the dataset
 url = "https://raw.githubusercontent.com/selva86/datasets/master/BostonHousing.csv"
-response = requests.get(url)
-
-with open("BostonHousing.csv", "wb") as file:
-    file.write(response.content)
-
-print("Dataset downloaded successfully!")
-
-data = pd.read_csv("BostonHousing.csv")
+data = pd.read_csv(url)
 
 print("First 5 rows of dataset:")
 print(data.head())
@@ -41,146 +30,97 @@ print(data.describe())
 print("Missing values check:")
 print(data.isnull().sum())
 
+# Visualize the correlation matrix
 plt.figure(figsize=(10, 8))
 sns.heatmap(data.corr(), annot=True, cmap='coolwarm')
 plt.title('Correlation Matrix')
 correlation_heatmap_path = 'plots/correlation_heatmap.png'
-plt.savefig(correlation_heatmap_path)  # Save the heatmap image
+plt.savefig(correlation_heatmap_path)
 plt.close()
 
+# Prepare features and target variable
 X = data.drop(columns=['medv'])  # Features
 y = data['medv']  # Target
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Initialize MLflow
-mlflow.start_run()
+# Start MLflow run for Linear Regression
+with mlflow.start_run():
+    lr_model = LinearRegression()
+    lr_model.fit(X_train, y_train)  # Train the model
+    y_pred_lr = lr_model.predict(X_test)  # Make predictions
 
-lr_model = LinearRegression()
-lr_model.fit(X_train, y_train)  # Train the model
-y_pred_lr = lr_model.predict(X_test)  # Make predictions
+    # Evaluate the model
+    mse_lr = mean_squared_error(y_test, y_pred_lr)
+    r2_lr = r2_score(y_test, y_pred_lr)
 
-# Evaluate Linear Regression model
-mse_lr = mean_squared_error(y_test, y_pred_lr)
-r2_lr = r2_score(y_test, y_pred_lr)
+    print(f"Linear Regression MSE: {mse_lr}")
 
-# Create a directory for Linear Regression model artifacts
-if not os.path.exists('artifacts/linear_regression'):
-    os.makedirs('artifacts/linear_regression')
+    # Log parameters and metrics
+    mlflow.log_param("model_type", "Linear Regression")
+    mlflow.log_metric("mse", mse_lr)
 
-# Log parameters and metrics for Linear Regression model
-mlflow.log_param("model_type", "Linear Regression")
-mlflow.log_metric("mse", mse_lr)
+    # Log the model
+    mlflow.sklearn.log_model(lr_model, "linear_regression_model")
 
-# Define signature for model logging
-signature = mlflow.models.signature.infer_signature(X_train, y_train)
+    # Save predictions plot
+    plt.figure(figsize=(8, 6))
+    plt.scatter(X_test['rm'], y_test, color='blue', label='Actual Prices')
+    plt.scatter(X_test['rm'], y_pred_lr, color='red', label='Predicted Prices')
+    plt.title('Linear Regression: Actual vs Predicted House Prices')
+    plt.xlabel('Average Number of Rooms (RM)')
+    plt.ylabel('House Price')
+    plt.legend()
+    linear_regression_plot_path = 'plots/linear_regression_actual_vs_predicted.png'
+    plt.savefig(linear_regression_plot_path)
+    plt.close()
 
-# Get the tracking URI type
-tracking_url_type_store = mlflow.get_tracking_uri()
+    # Log the plot
+    mlflow.log_artifact(linear_regression_plot_path)
 
-print("------------------Linear Regression Tracking------------------------")
-# Log the Linear Regression model conditionally based on tracking URL type
-if tracking_url_type_store != "file":
-    mlflow.sklearn.log_model(
-        lr_model, "model", registered_model_name="LinearRegressionBostonHousing", signature=signature
-    )
-else:
-    mlflow.sklearn.log_model(lr_model, "model", signature=signature)
+# Start MLflow run for Random Forest
+with mlflow.start_run():
+    rf_model = RandomForestRegressor(random_state=42)
+    rf_model.fit(X_train, y_train)  # Train the model
+    y_pred_rf = rf_model.predict(X_test)  # Make predictions
 
-# Save Linear Regression predictions plot
-plt.figure(figsize=(8, 6))
-plt.scatter(X_test['rm'], y_test, color='blue', label='Actual Prices')
-plt.scatter(X_test['rm'], y_pred_lr, color='red', label='Predicted Prices')
-plt.title('Linear Regression: Actual vs Predicted House Prices')
-plt.xlabel('Average Number of Rooms (RM)')
-plt.ylabel('House Price')
-plt.legend()
-linear_regression_plot_path = 'artifacts/linear_regression/actual_vs_predicted.png'
-plt.savefig(linear_regression_plot_path)
-plt.close()
+    # Evaluate the model
+    mse_rf = mean_squared_error(y_test, y_pred_rf)
+    r2_rf = r2_score(y_test, y_pred_rf)
 
-# Log the Linear Regression plot
-mlflow.log_artifact(linear_regression_plot_path)
+    print(f"Random Forest MSE: {mse_rf}")
 
-# End the first run
-mlflow.end_run()
+    # Log parameters and metrics
+    mlflow.log_param("model_type", "Random Forest")
+    mlflow.log_metric("mse", mse_rf)
 
-# Start a new run for Random Forest
-mlflow.start_run()
+    # Log the model
+    mlflow.sklearn.log_model(rf_model, "random_forest_model")
 
-rf_model = RandomForestRegressor(random_state=42)
-rf_model.fit(X_train, y_train)  # Train the model
-y_pred_rf = rf_model.predict(X_test)  # Make predictions
+    # Save predictions plot
+    plt.figure(figsize=(8, 6))
+    plt.scatter(X_test['rm'], y_test, color='blue', label='Actual Prices')
+    plt.scatter(X_test['rm'], y_pred_rf, color='red', label='Predicted Prices')
+    plt.title('Random Forest: Actual vs Predicted House Prices')
+    plt.xlabel('Average Number of Rooms (RM)')
+    plt.ylabel('House Price')
+    plt.legend()
+    random_forest_plot_path = 'plots/random_forest_actual_vs_predicted.png'
+    plt.savefig(random_forest_plot_path)
+    plt.close()
 
-# Evaluate Random Forest model
-mse_rf = mean_squared_error(y_test, y_pred_rf)
-r2_rf = r2_score(y_test, y_pred_rf)
+    # Log the plot
+    mlflow.log_artifact(random_forest_plot_path)
 
-# Create a directory for Random Forest model artifacts
-if not os.path.exists('artifacts/random_forest'):
-    os.makedirs('artifacts/random_forest')
-
-# Log parameters and metrics for Random Forest model
-mlflow.log_param("model_type", "Random Forest")
-mlflow.log_metric("mse", mse_rf)
-
-print("------------------Random Forest Tracking------------------------")
-# Log the Random Forest model conditionally based on tracking URL type
-if tracking_url_type_store != "file":
-    mlflow.sklearn.log_model(
-        rf_model, "model", registered_model_name="RandomForestBostonHousing", signature=signature
-    )
-else:
-    mlflow.sklearn.log_model(rf_model, "model", signature=signature)
-
-# Save Random Forest predictions plot
-plt.figure(figsize=(8, 6))
-plt.scatter(X_test['rm'], y_test, color='blue', label='Actual Prices')
-plt.scatter(X_test['rm'], y_pred_rf, color='red', label='Predicted Prices')
-plt.title('Random Forest: Actual vs Predicted House Prices')
-plt.xlabel('Average Number of Rooms (RM)')
-plt.ylabel('House Price')
-plt.legend()
-random_forest_plot_path = 'artifacts/random_forest/actual_vs_predicted.png'
-plt.savefig(random_forest_plot_path)
-plt.close()
-
-# Log the Random Forest plot
-mlflow.log_artifact(random_forest_plot_path)
-
-# Log the correlation heatmap plot again for both models
-mlflow.log_artifact(correlation_heatmap_path)
-
-# End the second MLflow run
-mlflow.end_run()
-
-best_model = None
-best_model_name = ""
-if mse_lr < mse_rf:
-    best_model = lr_model
-    best_model_name = "linear_regression_model"
-    print("\nBest model: Linear Regression")
-else:
-    best_model = rf_model
-    best_model_name = "random_forest_model"
-    print("\nBest model: Random Forest")
-
-print("------------------Registring Best Model------------------------")
-
-mlflow.start_run()  # Start a new run for saving the best model
-mlflow.sklearn.log_model(best_model, "best_model")
-
-# model_uri = f"runs:/{mlflow.active_run().info.run_id}/best_model"
-# mlflow.register_model(model_uri, best_model_name)
-
-if tracking_url_type_store != "file":
-    mlflow.sklearn.log_model(
-        best_model, f"best_model={best_model_name}", registered_model_name="BestModelBostonHousing", signature=signature
-    )
-else:
-    mlflow.sklearn.log_model(best_model,  f"best_model={best_model_name}", signature=signature)
-
-mlflow.end_run()
-
+# Compare Models
 print("\nComparison of Models:")
 print(f"Linear Regression MSE: {mse_lr}")
 print(f"Random Forest MSE: {mse_rf}")
+
+# Determine the best model
+best_model = lr_model if mse_lr < mse_rf else rf_model
+best_model_name = "Linear Regression" if mse_lr < mse_rf else "Random Forest"
+print(f"Best model: {best_model_name}")
+
+# Save the best model
+with mlflow.start_run():
+    mlflow.sklearn.log_model(best_model, "best_model")
