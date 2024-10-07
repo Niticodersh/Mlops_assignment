@@ -1,0 +1,15 @@
+artifact_uri: file:///workspace/mlruns/825996041371985882/eaf18d07c9f64166a9ef630e9b03bd16/artifacts
+end_time: 1728329627193
+entry_point_name: ''
+experiment_id: '825996041371985882'
+lifecycle_stage: active
+run_id: eaf18d07c9f64166a9ef630e9b03bd16
+run_name: capricious-toad-918
+run_uuid: eaf18d07c9f64166a9ef630e9b03bd16
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728329625156
+status: 3
+tags: []
+user_id: root

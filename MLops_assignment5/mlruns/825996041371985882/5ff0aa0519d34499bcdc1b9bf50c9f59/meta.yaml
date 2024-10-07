@@ -1,0 +1,15 @@
+artifact_uri: file:///workspace/mlruns/825996041371985882/5ff0aa0519d34499bcdc1b9bf50c9f59/artifacts
+end_time: 1728329625153
+entry_point_name: ''
+experiment_id: '825996041371985882'
+lifecycle_stage: active
+run_id: 5ff0aa0519d34499bcdc1b9bf50c9f59
+run_name: learned-hawk-767
+run_uuid: 5ff0aa0519d34499bcdc1b9bf50c9f59
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728329622960
+status: 3
+tags: []
+user_id: root
