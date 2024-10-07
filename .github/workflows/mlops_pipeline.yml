@@ -3,9 +3,13 @@ on:
     push:
         branches:
             - main
+        paths:
+            - 'MLops_assignment5/**'
     pull_request:
         branches:
             - main
+        paths:
+            - 'MLops_assignment5/**'
 jobs:
     build:
         runs-on: ubuntu-latest
@@ -20,7 +24,7 @@ jobs:
         - name: Install dependencies
           run: |
             pip install --upgrade pip
-            pip install -r requirements.txt
+            pip install -r MLops_assignment5/requirements.txt
         - name: Run training script
           run: |
-            python train.py
+            python MLops_assignment5/train.py
